@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Bank.Api;
+namespace Bank.Domain;
 
 public partial class Loan
 {
