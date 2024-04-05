@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BankAppDataContext>(options =>
     options.UseSqlServer("Data Source=localhost;Initial Catalog=BankAppData;Integrated Security=SSPI;TrustServerCertificate=True;"));
@@ -22,5 +23,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();
