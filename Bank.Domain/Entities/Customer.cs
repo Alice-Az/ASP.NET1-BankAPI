@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bank.Domain.Identity;
+using System;
 using System.Collections.Generic;
 
 namespace Bank.Domain;
@@ -31,5 +32,8 @@ public partial class Customer
 
     public string? Emailaddress { get; set; }
 
+    public string? UserId { get; set; }
+
     public virtual ICollection<Disposition> Dispositions { get; set; } = new List<Disposition>();
+    public virtual User? User { get; set; }
 }

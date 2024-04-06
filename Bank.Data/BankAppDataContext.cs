@@ -33,6 +33,14 @@ public partial class BankAppDataContext : IdentityDbContext<User>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<User>().HasOne(u => u.Customer)
+            .WithOne(c => c.User)
+            .HasForeignKey<Customer>(u => u.UserId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.ClientSetNull);
+        
+
         modelBuilder.Entity<Account>(entity =>
         {
             entity.HasKey(e => e.AccountId).HasName("PK_account");
