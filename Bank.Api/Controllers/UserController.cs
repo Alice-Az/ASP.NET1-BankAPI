@@ -1,7 +1,11 @@
-﻿using Bank.Domain.Identity;
-using Microsoft.AspNetCore.Http;
+﻿using Bank.Core.Interfaces;
+using Bank.Data;
+using Bank.Domain.DTO.Login;
+using Bank.Domain.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Api.Controllers
 {
@@ -12,16 +16,21 @@ namespace Bank.Api.Controllers
         //Identity sätts upp med dependency injection
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly BankAppDataContext _context;
+        private readonly ITokenService _tokenService;
 
         public UserController(UserManager<User> userManager,
-                              SignInManager<User> signinManager)
+                              SignInManager<User> signinManager, BankAppDataContext context, ITokenService tokenService)
         {
             _signInManager = signinManager;
             _userManager = userManager;
+            _context = context;
+            _tokenService = tokenService;
         }
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register(string username)
         {
 
@@ -41,24 +50,29 @@ namespace Bank.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginRequest request)
         {
             //Kontrollerar inloggningen mot databasen och tabellen AspNetUsers
-            var result = await _signInManager.PasswordSignInAsync(username, password, false, false);
+            User? user = await _userManager.FindByEmailAsync(request.Email);
 
-
-            if (result.Succeeded)
+            if (user != null)
             {
-                //Här kan vi lägga på en JWT token och skicka med i responsen
-
-                return Ok("Logged in");
+                var result = await _signInManager.PasswordSignInAsync(user, request.Password, false, false);
+                if (result.Succeeded)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    var response = _tokenService.GetToken(user, roles);
+                    return Ok(response);
+                }
+                else
+                {
+                    return Unauthorized();
+                }
             }
-            else
-            {
-                return Unauthorized();
-            }
+            return BadRequest();
         }
 
-
+        
     }
 }
