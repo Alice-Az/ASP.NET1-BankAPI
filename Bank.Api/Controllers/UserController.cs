@@ -1,11 +1,10 @@
 ﻿using Bank.Core.Interfaces;
-using Bank.Data;
+using Bank.Domain.DTO.Customer;
 using Bank.Domain.DTO.Login;
 using Bank.Domain.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Api.Controllers
 {
@@ -16,32 +15,37 @@ namespace Bank.Api.Controllers
         //Identity sätts upp med dependency injection
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly BankAppDataContext _context;
         private readonly ITokenService _tokenService;
+        private readonly ICustomerService _customerService;
 
         public UserController(UserManager<User> userManager,
-                              SignInManager<User> signinManager, BankAppDataContext context, ITokenService tokenService)
+                              SignInManager<User> signinManager, ITokenService tokenService, ICustomerService customerService)
         {
             _signInManager = signinManager;
             _userManager = userManager;
-            _context = context;
             _tokenService = tokenService;
+            _customerService = customerService;
         }
 
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Register(string username)
+        public async Task<IActionResult> CreateCustomer(CustomerRequest request)
         {
+            var user = new User()
+            {
+                UserName = request.Username,
+                Email = request.Emailaddress,
+            };
 
-            var userModel = new User();
-            userModel.UserName = username;
-
-            var result = await _userManager.CreateAsync(userModel, "1Z2fwelfjn#lkg3!");
+            var result = await _userManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
             {
-                return Ok("User created");
+                await _userManager.AddToRoleAsync(user, "Client");
+                int? customerId = await _customerService.CreateCustomer(request, user.Id);
+                if (customerId.HasValue) { return Ok("User created with Id: " + customerId); }
+                else return BadRequest();
             }
             else
             {
@@ -55,7 +59,7 @@ namespace Bank.Api.Controllers
         {
             //Kontrollerar inloggningen mot databasen och tabellen AspNetUsers
             User? user = await _userManager.FindByEmailAsync(request.Email);
-
+            
             if (user != null)
             {
                 var result = await _signInManager.PasswordSignInAsync(user, request.Password, false, false);
@@ -73,6 +77,19 @@ namespace Bank.Api.Controllers
             return BadRequest();
         }
 
-        
+        [HttpPost]
+        public async Task<IActionResult> CreateAdmin(string username, string password)
+        {
+            var result = await _userManager.CreateAsync(new User() { UserName = username }, password);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Error occured");
+            }
+        }
     }
 }

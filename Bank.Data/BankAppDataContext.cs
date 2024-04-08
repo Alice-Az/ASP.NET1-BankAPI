@@ -102,7 +102,6 @@ public partial class BankAppDataContext : IdentityDbContext<User>
         modelBuilder.Entity<Disposition>(entity =>
         {
             entity.HasKey(e => e.DispositionId).HasName("PK_disposition");
-
             entity.Property(e => e.Type).HasMaxLength(50);
 
             entity.HasOne(d => d.Account).WithMany(p => p.Dispositions)
@@ -119,7 +118,6 @@ public partial class BankAppDataContext : IdentityDbContext<User>
         modelBuilder.Entity<Loan>(entity =>
         {
             entity.HasKey(e => e.LoanId).HasName("PK_loan");
-
             entity.Property(e => e.Amount).HasColumnType("decimal(13, 2)");
             entity.Property(e => e.Payments).HasColumnType("decimal(13, 2)");
             entity.Property(e => e.Status).HasMaxLength(50);

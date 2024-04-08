@@ -1,8 +1,11 @@
 using Bank.Core.Interfaces;
 using Bank.Core.Services;
 using Bank.Data;
+using Bank.Data.Interfaces;
+using Bank.Data.Repositories;
 using Bank.Domain.DTO.Options;
 using Bank.Domain.Identity;
+using Bank.Domain.Profiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +25,20 @@ builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<BankAppDataContext>()
                 .AddDefaultTokenProviders();
 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // Password settings
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 3;
+});
+
+builder.Services.AddAutoMapper(typeof(CustomerProfile).Assembly);
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 
 SecurityOptions security = builder.Configuration.GetSection("Security").Get<SecurityOptions>() ?? new();
 builder.Services.AddAuthentication(opt =>
