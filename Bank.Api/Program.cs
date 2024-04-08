@@ -36,9 +36,12 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 builder.Services.AddAutoMapper(typeof(CustomerProfile).Assembly);
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
+builder.Services.AddScoped<ILoanService, LoanService>();
+builder.Services.AddScoped<ILoanRepo, LoanRepo>();
 
 SecurityOptions security = builder.Configuration.GetSection("Security").Get<SecurityOptions>() ?? new();
 builder.Services.AddAuthentication(opt =>
