@@ -8,6 +8,7 @@ namespace Bank.Domain.Profiles
         public AccountProfile() 
         {
             CreateMap<Account, AccountOverviewResponse>();
+            CreateMap<NewAccountRequest, Account>();
         }
     }
 }

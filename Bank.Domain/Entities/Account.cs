@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Bank.Domain;
+﻿namespace Bank.Domain;
 
 public partial class Account
 {

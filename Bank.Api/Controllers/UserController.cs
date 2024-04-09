@@ -44,8 +44,9 @@ namespace Bank.Api.Controllers
             {
                 await _userManager.AddToRoleAsync(user, "Client");
                 int? customerId = await _customerService.CreateCustomer(request, user.Id);
-                if (customerId.HasValue) { return Ok("User created with Id: " + customerId); }
-                else return BadRequest();
+
+                return customerId.HasValue ? Ok("User created with Id: " + customerId) 
+                                           : BadRequest();
             }
             else
             {
@@ -81,15 +82,7 @@ namespace Bank.Api.Controllers
         public async Task<IActionResult> CreateAdmin(string username, string password)
         {
             var result = await _userManager.CreateAsync(new User() { UserName = username }, password);
-
-            if (result.Succeeded)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest("Error occured");
-            }
+            return result.Succeeded ? Ok() : BadRequest("Error occured");
         }
     }
 }

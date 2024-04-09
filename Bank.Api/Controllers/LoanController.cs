@@ -21,9 +21,7 @@ namespace Bank.Api.Controllers
         public async Task<IActionResult> CreateLoan(LoanRequest request)
         {
             bool loanCreated = await _loanService.CreateLoan(request);
-            if (loanCreated) { return Ok("Loan created"); }
-
-            return BadRequest();
+            return loanCreated ? Ok(loanCreated) : BadRequest();
         }
     }
 }
