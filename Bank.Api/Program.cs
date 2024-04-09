@@ -42,6 +42,8 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<ILoanRepo, LoanRepo>();
+builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 SecurityOptions security = builder.Configuration.GetSection("Security").Get<SecurityOptions>() ?? new();
 builder.Services.AddAuthentication(opt =>

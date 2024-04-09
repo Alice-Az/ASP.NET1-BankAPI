@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class LoanController : ControllerBase
@@ -17,7 +17,7 @@ namespace Bank.Api.Controllers
             _loanService = loanService;
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateLoan(LoanRequest request)
         {
             bool loanCreated = await _loanService.CreateLoan(request);

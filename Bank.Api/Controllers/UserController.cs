@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace Bank.Api.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("create")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCustomer(CustomerRequest request)
         {
@@ -53,7 +53,7 @@ namespace Bank.Api.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginRequest request)
         {
@@ -77,7 +77,7 @@ namespace Bank.Api.Controllers
             return BadRequest();
         }
 
-        [HttpPost]
+        [HttpPost("create-admin")]
         public async Task<IActionResult> CreateAdmin(string username, string password)
         {
             var result = await _userManager.CreateAsync(new User() { UserName = username }, password);
