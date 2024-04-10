@@ -1,10 +1,6 @@
 ﻿using Bank.Data.Interfaces;
 using Bank.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Data.Repositories
 {
@@ -22,17 +18,22 @@ namespace Bank.Data.Repositories
             try
             {
                 await _context.Customers.AddAsync(customer);
-                Account account = new Account() 
-                {
-                    Frequency = "Monthly",
-                    Created = DateOnly.FromDateTime(DateTime.Now),
-                    Balance = 0,
-                    AccountTypesId = 1,
-                };
-                await _context.Accounts.AddAsync(account);
-                await _context.Dispositions.AddAsync(new Disposition() { Customer = customer, Account = account, Type = "OWNER" });
+                //await _context.Accounts.AddAsync(account);
+                //await _context.Dispositions.AddAsync(new Disposition() { Customer = customer, Account = account, Type = "OWNER" });
                 await _context.SaveChangesAsync();
                 return customer.CustomerId;
+            }
+            catch { return null; }
+        }
+
+        public async Task<Customer?> GetCustomerByUserId(string userId)
+        {
+            try
+            {
+                return await _context.Customers.Include(c => c.Dispositions)
+                                               .ThenInclude(d => d.Account)
+                                               .ThenInclude(a => a.AccountTypes)
+                                               .FirstOrDefaultAsync(c => c.UserId == userId);
             }
             catch { return null; }
         }

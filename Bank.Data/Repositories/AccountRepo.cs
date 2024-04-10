@@ -13,57 +13,39 @@ namespace Bank.Data.Repositories
             _context = context;
         }
 
-        public async Task<List<Account>?> GetAccountsOverview(string userId)
+        public async Task<List<Transaction>?> GetAccountDetails(int accountId)
         {
             try
             {
-                Customer? customer = await _context.Customers.Include(c => c.Dispositions)
-                                               .ThenInclude(d => d.Account)
-                                               .ThenInclude(a => a.AccountTypes)
-                                               .FirstOrDefaultAsync(c => c.UserId == userId);
-
-                if (customer != null)
-                {
-                    return customer.Dispositions.Select(d => d.Account).ToList();
-                }
-                return null;
+                return await _context.Transactions.Where(t => t.AccountId == accountId).ToListAsync();
             }
             catch { return null; }
         }
 
-        public async Task<List<Transaction>?> GetAccountDetails(int accountId, string userId)
+        public async Task<int?> CreateAccount(Account account, Customer customer)
         {
             try
             {
-                Customer? customer = await _context.Customers.Include(c => c.Dispositions)
-                                                             .ThenInclude(d => d.Account)
-                                                             .SingleOrDefaultAsync(c => c.UserId == userId);
-                if (customer != null)
-                {
-                    bool accountExists = customer.Dispositions.Any(d => d.AccountId == accountId);
-                    return accountExists ? await _context.Transactions.Where(t => t.AccountId == accountId).ToListAsync()
-                                         : null;
-                }
-                return null;
+                await _context.Accounts.AddAsync(account);
+                await _context.Dispositions.AddAsync(new Disposition() { Account = account, Customer = customer, Type = "OWNER" });
+                await _context.SaveChangesAsync();
+                return account.AccountId;
             }
             catch { return null; }
         }
 
-        public async Task<int?> CreateAccount(Account account, string userId)
+        public async Task<Account?> GetAccountById(int accountId)
         {
             try
             {
-                Customer? customer = await _context.Customers.SingleOrDefaultAsync(c => c.UserId == userId);
-                if (customer != null)
-                {
-                    await _context.Accounts.AddAsync(account);
-                    await _context.Dispositions.AddAsync(new Disposition() { Account = account, Customer = customer, Type = "OWNER" });
-                    await _context.SaveChangesAsync();
-                    return account.AccountId;
-                }
-                return null;
+                return await _context.Accounts.SingleOrDefaultAsync(a => a.AccountId == accountId);
             }
             catch { return null; }
+        }
+
+        public async void UpdateAccount(Account account)
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

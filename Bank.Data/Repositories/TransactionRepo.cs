@@ -32,5 +32,15 @@ namespace Bank.Data.Repositories
             catch { return false; }
         }
 
+        public async Task<bool> CreateTransfer(Transaction debitTransaction, Transaction creditTransaction)
+        {
+            try
+            {
+                await _context.Transactions.AddRangeAsync(debitTransaction, creditTransaction);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch { return false; }
+        }
     }
 }

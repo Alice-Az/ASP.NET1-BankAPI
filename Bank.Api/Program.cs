@@ -46,6 +46,7 @@ builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionRepo, TransactionRepo>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 SecurityOptions security = builder.Configuration.GetSection("Security").Get<SecurityOptions>() ?? new();
 builder.Services.AddAuthentication(opt =>
