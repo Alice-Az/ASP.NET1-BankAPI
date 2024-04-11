@@ -33,7 +33,6 @@ namespace Bank.Core.Services
                 {
                     claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
                 }
-                //roles.Select(r => claims.Add(new Claim(ClaimTypes.Role, r.ToString())));
 
                 var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(security.Key));
                 var signInCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
